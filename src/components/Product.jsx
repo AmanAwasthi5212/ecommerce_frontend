@@ -1,6 +1,8 @@
 import { FavoriteBorderOutlined, SearchOutlined, ShoppingCartOutlined } from '@material-ui/icons';
 import React from 'react'
-import styled from 'styled-components'
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { useSelector } from 'react-redux'
 
 const Info = styled.div`
     opacity: 0;
@@ -70,16 +72,37 @@ const Icon = styled.div`
 `;
 
 const Product = ({item}) => {
+
+    const {isFetching, error,currentUser} = useSelector((state) => state.user);
+
+    const handleAddToCart = async()=>{
+        const response = await fetch("http://localhost:5000/api/carts/addToCart",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                accessToken:currentUser.accessToken,
+                productId:item._id,
+                quantity:1,
+            }),
+        });
+        const body = await response.json();
+        console.log(body);
+    }
+
   return (
     <Container>
       <Circle/>
       <Image src={item.img}/>
       <Info>
-        <Icon>
+        <Icon onClick={handleAddToCart}>
             <ShoppingCartOutlined/>
         </Icon>
         <Icon>
+            <Link to={`/product/${item._id}`}>
             <SearchOutlined/>
+            </Link>
         </Icon>
         <Icon>
             <FavoriteBorderOutlined/>

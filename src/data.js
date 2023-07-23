@@ -27,16 +27,19 @@ export const categories = [
         id: 1,
         img: "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/b602b57a-a43c-4f26-9f7c-b60375e3523f/sportswear-tech-pack-woven-long-sleeve-shirt-47rHn4.png",
         title: "SHIRT STYLE",
+        cat: "women"
     },
     {
         id: 2,
         img: "https://assets.myntassets.com/h_720,q_90,w_540/v1/assets/images/19592118/2022/9/2/f20fa85b-86da-47a8-b116-de4968873f1f1662099732168-SASSAFRAS-Women-Co-Ords-4491662099731609-3.jpg",
         title: "LOUNGEWEAR LOVE",
+        cat:"coat"
     },
     {
         id: 3,
         img: "https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/593d5566-a67e-4b48-9869-e873600e0533/paris-saint-germain-anthem-jacket-hQXZPD.png",
         title: "LIGHT JACKETS",
+        cat:"jeans"
     },
 ];
 

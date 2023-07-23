@@ -3,6 +3,8 @@ import { Search, ShoppingCartOutlined } from '@material-ui/icons';
 import React from 'react'
 import styled from 'styled-components';
 import {mobile} from "../responsive";
+import {useSelector} from "react-redux";
+import { Link, useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
     height: 60px;
@@ -54,6 +56,7 @@ const Center = styled.div`
 const Logo = styled.h1`
     font-weight: bold;
     ${mobile({fontSize: "24px"})}
+    color: teal;
 `;
 
 const Right = styled.div`
@@ -72,6 +75,10 @@ const MenuItem = styled.div`
 `;
 
 const Navbar = () => {
+    const quantity = useSelector(state=>state.cart.quantity);
+    const navigate = useNavigate();
+    let user = JSON.parse(localStorage.getItem('user-info'));
+
   return (
     <Container>
      <Wrapper>
@@ -82,15 +89,19 @@ const Navbar = () => {
                 <Search style = {{color:"gray",fontSize:16}}/>
             </SearchContainer>
         </Left>
-        <Center><Logo>EasyShop</Logo></Center>
+        <Center>
+            <Link to="/"><Logo>EasyShop</Logo></Link>
+            </Center>
         <Right>
-            <MenuItem>REGISTER</MenuItem>
-            <MenuItem>SIGN IN</MenuItem>
-            <MenuItem>
-            <Badge badgeContent={4} color="primary">
-            <ShoppingCartOutlined />
-            </Badge>
-            </MenuItem>
+            <Link to="/register"><MenuItem>REGISTER</MenuItem></Link>
+            <Link to="/login"><MenuItem>LOGOUT</MenuItem></Link>
+            <Link to="/cart">
+                <MenuItem>
+                <Badge badgeContent={quantity} color="primary">
+                <ShoppingCartOutlined />
+                </Badge>
+                </MenuItem>
+            </Link>
         </Right>
     </Wrapper>
     </Container>

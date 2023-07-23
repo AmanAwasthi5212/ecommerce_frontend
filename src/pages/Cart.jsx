@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useEffect,useState } from 'react'
 import styled from 'styled-components'
 import Announcement from "../components/Announcement"
 import Navbar from "../components/navbar"
 import Footer from "../components/Footer"
 import { Add, Remove } from '@material-ui/icons'
 import { mobile } from '../responsive'
+import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -152,7 +154,60 @@ const Button = styled.button`
     font-weight: 600;
 `;
 
+
 const Cart = () => {
+    const cart = useSelector(state=>state.cart);
+    const {isFetching, error,currentUser} = useSelector((state) => state.user);
+    console.log(currentUser);
+
+
+    const [backendCart,setBackendCart] = useState([]);
+
+    const navigate = useNavigate();
+    
+    const handleSubmit = ()=>{
+        navigate('/payment', { state: { price: cart.total} });
+    }
+
+    const getCartData = async ()=>{
+        const response = await fetch("http://localhost:5000/api/carts/find",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                accessToken:currentUser.accessToken,
+            }),
+        });
+
+        const body = await response.json();
+        console.log("hello");   
+        console.log(body);
+        setBackendCart(body);
+    }
+
+    const handleCartUpdate =async (change,productId)=>{
+        const response = await fetch("http://localhost:5000/api/carts/changeCartQuantity",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                accessToken:currentUser.accessToken,
+                productId : productId,
+                change : change
+            }),
+        });
+
+        const body = await response.json();
+        console.log(body);
+        setBackendCart(body);
+    }
+
+    useEffect(()=>{
+        console.log(cart);
+        getCartData();
+    },[]);
   return (
     <Container>
       <Navbar/>
@@ -165,55 +220,39 @@ const Cart = () => {
                     <TopText>Shopping Bag(2)</TopText>
                     <TopText>Your Wishlist(0)</TopText>
                 </TopTexts>
-                <TopButton type="filled">CHECKOUT NOW</TopButton>
+                <TopButton type="filled" onClick={handleSubmit}>CHECKOUT NOW</TopButton>
             </Top>
             <Bottom>
                 <Info>
-                    <Product>
+                   { backendCart?.products?.map(product => (
+                   <Product>
                         <ProductDetail>
-                            <Image src="https://static.nike.com/a/images/c_limit,w_592,f_auto/t_product_v1/7b2e3a8e-06d6-4084-a9c4-fb046bdb1ee5/dunk-mid-shoes-6m6jH7.png"/>
+                            <Image src={product.productId.img}/>
                             <Details>
-                                <ProductName><b>Product: </b>Nike Dunk Mid Shoes</ProductName>
-                                <ProductId><b>Id: </b>DV0830-101</ProductId>
-                                <Productcolor color="orange"/>
-                                <ProductSize><b>Size: </b>37.5</ProductSize>
+                                <ProductName><b>Product: </b>{product.productId.title}</ProductName>
+                                <ProductId><b>Id: </b>{ product.productId._id }</ProductId>
+                                <Productcolor color={product.productId.color}/>
+                                <ProductSize><b>Size: </b>{product.productId.size}</ProductSize>
                             </Details>
                         </ProductDetail>
                         <PriceDetail>
                             <ProductAmountContainer>
-                                <Add/>
-                                <ProductAmount>1</ProductAmount>
-                                <Remove/>
+                                <Add onClick={()=>handleCartUpdate(1,product.productId._id)}/>
+                                <ProductAmount>{product.quantity}</ProductAmount>
+                                <Remove onClick={()=>handleCartUpdate(-1,product.productId._id)}/>
                             </ProductAmountContainer>
-                            <ProductPrice>MRP : ₹ 10 295.00</ProductPrice>
+                            <ProductPrice>MRP : ₹ {product.productId.price }</ProductPrice>
                         </PriceDetail>
-                    </Product>
-                    <Hr/>
-                    <Product>
-                        <ProductDetail>
-                            <Image src="https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/12d4afe6-6e3c-4876-880f-3fdf1816c534/dri-fit-adv-tour-short-sleeve-golf-polo-S6DgKV.png"/>
-                            <Details>
-                                <ProductName><b>Product: </b>NIKE Women's Tank Top</ProductName>
-                                <ProductId><b>Id: </b>DR5666-601</ProductId>
-                                <Productcolor color="#e9b3c1"/>
-                                <ProductSize><b>Size: </b>M</ProductSize>
-                            </Details>
-                        </ProductDetail>
-                        <PriceDetail>
-                            <ProductAmountContainer>
-                                <Add/>
-                                <ProductAmount>1</ProductAmount>
-                                <Remove/>
-                            </ProductAmountContainer>
-                            <ProductPrice>MRP : ₹ 3 695.00</ProductPrice>
-                        </PriceDetail>
-                    </Product>
-                </Info>
+                    </Product>  
+                    ))}
+                    <Hr/> 
+                </Info>{
+                    backendCart?.products?.length > 0 &&
                     <Summary>
                         <SummaryTitle>ORDER SUMMARY</SummaryTitle>
                         <SummaryItem>
                             <SummaryItemText>Subtotal </SummaryItemText>
-                            <SummaryItemPrice>₹ 13 990</SummaryItemPrice>
+                            <SummaryItemPrice>₹ {backendCart.total}</SummaryItemPrice>
                         </SummaryItem>
                         <SummaryItem>
                             <SummaryItemText>Estimated Shipping </SummaryItemText>
@@ -225,10 +264,11 @@ const Cart = () => {
                         </SummaryItem>
                         <SummaryItem type="total">
                             <SummaryItemText>Total </SummaryItemText>
-                            <SummaryItemPrice>₹ 13 990</SummaryItemPrice>
+                            <SummaryItemPrice>₹ {backendCart.total}</SummaryItemPrice>
                         </SummaryItem>
-                        <Button>CHECKOUT NOW</Button>
+                        <Button onClick={handleSubmit}>CHECKOUT NOW</Button>
                     </Summary>
+                    }
             </Bottom>
         </Wrapper>
       <Footer/>
