@@ -55,22 +55,45 @@ const Button = styled.button`
 `;
 
 const Register = () => {
+
+    const handleRegister = async (e)=>{
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+        const email = document.getElementById("email").value;
+        const confirmPassword = document.getElementById("confirm_password").value;
+
+        const response = await fetch("http://localhost:5000/api/auth/register",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                username : username,
+                password : password,
+                email : email,
+            }),
+        });
+        const body = await response.json();
+        console.log(body);
+    }
+
   return (
     <Container>
       <Wrapper>
         <Title>CREATE AN ACCOUNT</Title>
         <Form>
-            <Input placeholder="Name"/>
-            <Input placeholder="Last Name"/>
-            <Input placeholder="Username"/>
-            <Input placeholder="Email"/>
-            <Input placeholder="Password"/>
-            <Input placeholder="Confirm Password"/>
+            <Input placeholder="First Name" id="fname" />
+            <Input placeholder="Last Name" id="lname"/>
+            <Input placeholder="Username" id="username"/>
+            <Input placeholder="Email" id="email"/>
+            <Input placeholder="Password" id="password"/>
+            <Input placeholder="Confirm Password" id="confirm_password"/>
             <Agreement>
                 By creating an account, I consent to the processing of my personal
                 data in accordance with the <p>PRIVACY POLICY.</p>
             </Agreement>
-            <Button>CREATE</Button>
+            <Button onClick={handleRegister}>CREATE</Button>
         </Form>
       </Wrapper>
     </Container>
