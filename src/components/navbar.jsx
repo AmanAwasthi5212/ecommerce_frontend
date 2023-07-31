@@ -79,6 +79,27 @@ const Navbar = () => {
     const navigate = useNavigate();
     let user = JSON.parse(localStorage.getItem('user-info'));
 
+
+    const {isFetching, error,currentUser} = useSelector((state) => state.user);
+
+    const handleLogOut = ()=>{
+        console.log("Handle Logout of user!");
+    }
+
+    const handleUserAuthButtonDisplay = ()=>{
+        if(!currentUser) {
+            return (
+                <>
+                    <Link to="/register"><MenuItem>REGISTER</MenuItem></Link>
+                    <Link to="/login"><MenuItem>LOGIN</MenuItem></Link>
+                </>
+            )
+        }
+        else {
+            return <MenuItem onClick={handleLogOut}>LOGOUT</MenuItem>
+        }
+    }
+
   return (
     <Container>
      <Wrapper>
@@ -93,8 +114,7 @@ const Navbar = () => {
             <Link to="/"><Logo>EasyShop</Logo></Link>
             </Center>
         <Right>
-            <Link to="/register"><MenuItem>REGISTER</MenuItem></Link>
-            <Link to="/login"><MenuItem>LOGOUT</MenuItem></Link>
+            {handleUserAuthButtonDisplay()}
             <Link to="/cart">
                 <MenuItem>
                 <Badge badgeContent={quantity} color="primary">

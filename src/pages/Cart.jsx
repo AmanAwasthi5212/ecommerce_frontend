@@ -6,7 +6,7 @@ import Footer from "../components/Footer"
 import { Add, Remove } from '@material-ui/icons'
 import { mobile } from '../responsive'
 import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -166,7 +166,8 @@ const Cart = () => {
     const navigate = useNavigate();
     
     const handleSubmit = ()=>{
-        navigate('/payment', { state: { price: cart.total} });
+        console.log(cart);
+        navigate('/payment', { state: { price: backendCart.total} });
     }
 
     const getCartData = async ()=>{
@@ -215,7 +216,7 @@ const Cart = () => {
       <Wrapper>
             <Title>YOUR BAG</Title>
             <Top>
-                <TopButton>CONTINUE SHOPPING</TopButton>
+                <Link to="/products"><TopButton>CONTINUE SHOPPING</TopButton></Link>
                 <TopTexts>
                     <TopText>Shopping Bag(2)</TopText>
                     <TopText>Your Wishlist(0)</TopText>

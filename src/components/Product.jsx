@@ -76,6 +76,7 @@ const Product = ({item}) => {
     const {isFetching, error,currentUser} = useSelector((state) => state.user);
 
     const handleAddToCart = async()=>{
+        console.log(currentUser);
         const response = await fetch("http://localhost:5000/api/carts/addToCart",{
             method:"POST",
             headers: {
