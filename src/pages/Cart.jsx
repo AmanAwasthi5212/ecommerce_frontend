@@ -7,6 +7,7 @@ import { Add, Remove } from '@material-ui/icons'
 import { mobile } from '../responsive'
 import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+import { useRef } from 'react'
 
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -157,11 +158,20 @@ const Button = styled.button`
 
 const Cart = () => {
     const cart = useSelector(state=>state.cart);
-    const {isFetching, error,currentUser} = useSelector((state) => state.user);
-    console.log(currentUser);
 
 
     const [backendCart,setBackendCart] = useState([]);
+    const [user,setUser] = useState(null);
+    const ref = useRef();
+    ref.user = user;
+
+    useEffect(()=>{
+        const curUser = JSON.parse(localStorage.getItem('user'));
+        setUser(curUser);
+        console.log(curUser);
+        if(!curUser) navigate("/login");
+        else getCartData(curUser.accessToken);
+    },[]);
 
     const navigate = useNavigate();
     
@@ -170,19 +180,18 @@ const Cart = () => {
         navigate('/payment', { state: { price: backendCart.total} });
     }
 
-    const getCartData = async ()=>{
+    const getCartData = async (accessToken)=>{
         const response = await fetch("http://localhost:5000/api/carts/find",{
             method:"POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body:JSON.stringify({
-                accessToken:currentUser.accessToken,
+                accessToken:accessToken,
             }),
         });
 
-        const body = await response.json();
-        console.log("hello");   
+        const body = await response.json();  
         console.log(body);
         setBackendCart(body);
     }
@@ -194,7 +203,7 @@ const Cart = () => {
                 "Content-Type": "application/json",
             },
             body:JSON.stringify({
-                accessToken:currentUser.accessToken,
+                accessToken:ref.user.accessToken,
                 productId : productId,
                 change : change
             }),
@@ -205,10 +214,6 @@ const Cart = () => {
         setBackendCart(body);
     }
 
-    useEffect(()=>{
-        console.log(cart);
-        getCartData();
-    },[]);
   return (
     <Container>
       <Navbar/>

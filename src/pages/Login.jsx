@@ -74,32 +74,37 @@ const Login = () => {
     const [password,setPassword] = useState("");
     const dispatch = useDispatch();
     const {isFetching, error,currentUser} = useSelector((state) => state.user);
+    const [user,setUser] = useState(null);
 
     const handleClick =async (e) =>{
-        e.preventDefault()
-        login(dispatch, { username, password });
+        e.preventDefault();
+        // login(dispatch, { username, password });
 
-        // const response = await fetch("http://localhost:5000/api/auth/login",{
-        //     method:"POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body:JSON.stringify({
-        //         username,
-        //         password
-        //     }),
-        // });
+        const response = await fetch("http://localhost:5000/api/auth/login",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                username,
+                password
+            }),
+        });
 
-        // const body = await response.json();
-        // console.log(body);
+        const body = await response.json();
+        if(body !="Wrong Credentials!"){
+            localStorage.setItem('user',JSON.stringify(body));
+            setUser(body);
+            console.log(body);
+            navigate("/");
+        }
 
     };
 
     useEffect(()=>{
-        // if(currentUser){
-        //     navigate("/");
-        // }
-    },[currentUser]);
+        const user =JSON.parse(localStorage.getItem('user'));
+        if(user) navigate("/");
+    },[]);
 
   return (
     <Container>

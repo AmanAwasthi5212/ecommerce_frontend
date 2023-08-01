@@ -10,6 +10,8 @@ import { useLocation } from 'react-router-dom';
 import { publicRequest } from '../requestMethods';
 import { useDispatch } from "react-redux";
 import { addProduct } from '../redux/cartRedux';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router';
 
 const Container = styled.div``;
 
@@ -128,16 +130,27 @@ const Product = () => {
     const [size, setSize] = useState("");
     const dispatch = useDispatch();
 
+    
+    const navigate = useNavigate();
+    const [user,setUser] = useState(null);
+    const ref = useRef();
+    ref.user = user;
+
     useEffect(() =>{
         const getProduct = async () =>{
             try{
                 const res = await publicRequest.get("http://localhost:5000/api/products/find/" + id);
                 setProduct(res.data);
-                console.log(res.data);
             } catch{}
         };
         getProduct()
     },[id]);
+
+    useEffect(()=>{
+        const curUser = JSON.parse(localStorage.getItem('user'));
+        setUser(curUser);
+        if(!curUser) navigate("/login");
+    },[]);
 
     const handleQuantity = (type) => {
         if(type === "dec") {
@@ -146,6 +159,20 @@ const Product = () => {
             setQuantity(quantity + 1);
         }
     };
+
+    const handleAddToCart = async()=>{
+        await fetch("http://localhost:5000/api/carts/addToCart",{
+            method:"POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body:JSON.stringify({
+                accessToken:ref.user.accessToken,
+                productId:product._id,
+                quantity:quantity,
+            }),
+        });
+    }
 
     const handleClick = () => {
         dispatch(addProduct({ ...product, quantity, color, size }));
@@ -188,7 +215,7 @@ const Product = () => {
                     <Amount>{quantity}</Amount>
                     <Add onClick={() => handleQuantity("inc")}/>
                 </AmountContainer>
-                <Button onClick={handleClick}>ADD TO CART</Button>
+                <Button onClick={handleAddToCart}>ADD TO CART</Button>
             </AddContainer>
         </InfoContainer>
       </Wrapper>

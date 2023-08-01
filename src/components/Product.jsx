@@ -3,6 +3,9 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux'
+import { useRef } from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 const Info = styled.div`
     opacity: 0;
@@ -74,22 +77,27 @@ const Icon = styled.div`
 const Product = ({item}) => {
 
     const {isFetching, error,currentUser} = useSelector((state) => state.user);
+    const [user,setUser] = useState(null);
+    const ref = useRef();
+    ref.user = user;
+
+    useEffect(()=>{
+        const curUser = JSON.parse(localStorage.getItem('user'));
+        setUser(curUser);
+    },[]);
 
     const handleAddToCart = async()=>{
-        console.log(currentUser);
-        const response = await fetch("http://localhost:5000/api/carts/addToCart",{
+        await fetch("http://localhost:5000/api/carts/addToCart",{
             method:"POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body:JSON.stringify({
-                accessToken:currentUser.accessToken,
+                accessToken:ref.user.accessToken,
                 productId:item._id,
                 quantity:1,
             }),
         });
-        const body = await response.json();
-        console.log(body);
     }
 
   return (

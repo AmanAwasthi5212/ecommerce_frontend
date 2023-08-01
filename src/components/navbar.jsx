@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import {mobile} from "../responsive";
 import {useSelector} from "react-redux";
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useRef } from 'react';
 
 const Container = styled.div`
     height: 60px;
@@ -81,13 +84,23 @@ const Navbar = () => {
 
 
     const {isFetching, error,currentUser} = useSelector((state) => state.user);
+    const [curUser,setCurUser] = useState(null);
+    const ref = useRef();
+    ref.curUser = curUser;
+
+    useEffect(()=>{
+        const user = JSON.parse(localStorage.getItem('user'));
+        setCurUser(user);
+    },[]);
 
     const handleLogOut = ()=>{
-        console.log("Handle Logout of user!");
+        localStorage.removeItem('user');
+        setCurUser(null);
+        navigate("/");
     }
 
     const handleUserAuthButtonDisplay = ()=>{
-        if(!currentUser) {
+        if(!ref.curUser) {
             return (
                 <>
                     <Link to="/register"><MenuItem>REGISTER</MenuItem></Link>
